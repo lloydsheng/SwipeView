@@ -25,7 +25,7 @@
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
+    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
     {
         //set up colors
         self.colors = [NSMutableArray array];
@@ -45,35 +45,46 @@
     [super viewDidLoad];
     
     //configure swipe view
-    _swipeView.alignment = SwipeViewAlignmentCenter;
-    _swipeView.pagingEnabled = YES;
-    _swipeView.wrapEnabled = NO;
-    _swipeView.itemsPerPage = 3;
-    _swipeView.truncateFinalPage = YES;
+    self.swipeView.alignment = SwipeViewAlignmentCenter;
+    self.swipeView.pagingEnabled = YES;
+    self.swipeView.wrapEnabled = NO;
+    self.swipeView.itemsPerPage = 3;
+    self.swipeView.truncateFinalPage = YES;
     
     //configure page control
-    _pageControl.numberOfPages = _swipeView.numberOfPages;
-    _pageControl.defersCurrentPageDisplay = YES;
+    self.pageControl.numberOfPages = self.swipeView.numberOfPages;
+    self.pageControl.defersCurrentPageDisplay = YES;
+    
+    //add wrap toggle
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Toggle Wrap"
+                                                                              style:UIBarButtonItemStylePlain
+                                                                             target:self
+                                                                             action:@selector(toggle)];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+- (void)toggle
+{
+    self.swipeView.wrapEnabled = !self.swipeView.wrapEnabled;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(__unused UIInterfaceOrientation)interfaceOrientation
 {
     return YES;
 }
 
-- (NSInteger)numberOfItemsInSwipeView:(SwipeView *)swipeView
+- (NSInteger)numberOfItemsInSwipeView:(__unused SwipeView *)swipeView
 {
-    return [self.colors count];
+    return (NSInteger)[self.colors count];
 }
 
-- (UIView *)swipeView:(SwipeView *)swipeView viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view
+- (UIView *)swipeView:(__unused SwipeView *)swipeView viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view
 {
     UILabel *label = (UILabel *)view;
     
     //create or reuse view
     if (view == nil)
     {
-        label = [[[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 100.0f, 100.0f)] autorelease];
+        label = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 100.0f, 100.0f)];
         label.textAlignment = UITextAlignmentCenter;
         label.textColor = [UIColor whiteColor];
         view = label;
@@ -90,10 +101,10 @@
 - (void)swipeViewCurrentItemIndexDidChange:(SwipeView *)swipeView
 {
     //update page control page
-    _pageControl.currentPage = swipeView.currentPage;
+    self.pageControl.currentPage = swipeView.currentPage;
 }
 
-- (void)swipeView:(SwipeView *)swipeView didSelectItemAtIndex:(NSInteger)index
+- (void)swipeView:(__unused SwipeView *)swipeView didSelectItemAtIndex:(NSInteger)index
 {
     NSLog(@"Selected item at index %i", index);
 }
@@ -101,14 +112,7 @@
 - (IBAction)pageControlTapped
 {
     //update swipe view page
-    [_swipeView scrollToPage:_pageControl.currentPage duration:0.4];
-}
-
-- (void)dealloc
-{
-    [_swipeView release];
-    [_colors release];
-    [super dealloc];
+    [self.swipeView scrollToPage:self.pageControl.currentPage duration:0.4];
 }
 
 @end
